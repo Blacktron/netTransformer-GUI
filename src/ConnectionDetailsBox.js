@@ -1,41 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
-import {List, ListItem, MakeSelectable} from 'material-ui/List';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-
-
-let SelectableList = MakeSelectable(List);
-
-function wrapState(ComposedComponent) {
-    return class SelectableList extends Component {
-        static propTypes = {
-            children: PropTypes.node.isRequired,
-            defaultValue: PropTypes.number.isRequired
-        };
-
-        componentWillMount() {
-            this.setState({
-                selectedIndex: this.props.defaultValue
-            });
-        }
-
-        handleRequestChange = (event, index) => {
-            this.setState({
-                selectedIndex: index
-            });
-            this.props.onChange(event, index)
-        };
-        render() {
-            return (
-                <ComposedComponent value={this.state.selectedIndex} onChange={this.handleRequestChange}>
-                    {this.props.children}
-                </ComposedComponent>
-            );
-        }
-    };
-}
-
-SelectableList = wrapState(SelectableList);
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
 class ConnectionDetailsBox extends Component {
     constructor(props) {
@@ -48,7 +13,7 @@ class ConnectionDetailsBox extends Component {
     };
     render() {
         return (
-            <div className="connectionDetails">
+            <div className="ConnectionDetailsBox">
                 <ConnectionDetailsList client={this.props.client} pollInterval={this.props.pollInterval} onChange={this.connectionListChanged.bind(this)}>
                 </ConnectionDetailsList>
                 <ConnectionDetailsParams client={this.props.client} pollInterval={this.props.pollInterval} ref="params">
@@ -69,8 +34,9 @@ class ConnectionDetailsList extends Component {
     }
     loadConnectionDetailFromServer(){
         this.props.client.getConnections((conn) => {
+            var arr = Object.keys(conn).map(function(k) { return {name: k }});
             this.setState({
-                conn: Object.keys(conn)
+                conn: arr
             });
         });
     }
@@ -78,20 +44,36 @@ class ConnectionDetailsList extends Component {
         this.loadConnectionDetailFromServer();
         setInterval(this.loadConnectionDetailFromServer, this.props.pollInterval);
     }
-    handleRequestChange = (event, index) => {
-        this.props.onChange(this.state.conn[index]);
+
+    handleRequestChange = (event) => {
+        this.props.onChange(event.name);
     };
     render() {
+        var cellEditProp = {
+            mode: "click",
+            blurToSave: true,
+            afterSaveCell: onAfterSaveCell
+        };
+        var selectRowProp = {
+            mode: "radio",
+            clickToSelect: true,
+            bgColor: "rgb(238, 193, 213)",
+            onSelect: this.handleRequestChange
+        };
+
         return (
             <div className="connectionDetails_names">
                 <b>Connection Name</b>
-                <SelectableList defaultValue={0} onChange={this.handleRequestChange}>
-                    {
-                        this.state.conn.map((conn, idx) => (
-                            <ListItem primaryText={conn} key={conn} value={idx}/>
-                        ))
-                    }
-                </SelectableList>
+                <BootstrapTable  data={this.state.conn}
+                                striped={true}
+                                hover={true}
+                                cellEdit={cellEditProp}
+                                insertRow={true}
+                                deleteRow={true}
+                                selectRow={selectRowProp}
+                >
+                    <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+                </BootstrapTable>
             </div>
         )
     }
@@ -101,7 +83,7 @@ class ConnectionDetailsParams extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            connParams: {params: []}
+            connParams: {connectionType: "", params: []}
         };
         // Functions must be bound manually with ES6 classes
         this.loadConnectionParamsFromServer = this.loadConnectionParamsFromServer.bind(this);
@@ -109,35 +91,41 @@ class ConnectionDetailsParams extends Component {
 
     loadConnectionParamsFromServer(connName){
         this.props.client.getConnectionParams(connName, (connParams) => {
+            var arr = Object.keys(connParams.params).map(function(k) { return { name: k, value: connParams.params[k] }});
             this.setState({
-                connParams: connParams
+                connParams: {connectionType: connParams.connectionType, params: arr}
             });
         });
     };
 
     render() {
+        var cellEditProp = {
+            mode: "click",
+            blurToSave: true,
+            afterSaveCell: onAfterSaveCell
+        };
+        var selectRowProp = {
+            mode: "checkbox",
+            clickToSelect: true
+        };
         return (
-            <div className="connectionDetails_props">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHeaderColumn>Name</TableHeaderColumn>
-                            <TableHeaderColumn>Value</TableHeaderColumn>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            Object.keys(this.state.connParams.params).map(key => (
-                                <TableRow key={key}>
-                                    <TableRowColumn>{key}</TableRowColumn>
-                                    <TableRowColumn>{this.state.connParams.params[key]}</TableRowColumn>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            </div>
+        <BootstrapTable data={this.state.connParams.params}
+                        striped={true}
+                        hover={true}
+                        cellEdit={cellEditProp}
+                        insertRow={true}
+                        deleteRow={true}
+                        selectRow={selectRowProp}
+            >
+            <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+            <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
+        </BootstrapTable>
         )
     }
+}
+function onAfterSaveCell(row, cellName, cellValue){
+    console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
+    console.log("Thw whole row :");
+    console.log(row);
 }
 export default ConnectionDetailsBox;

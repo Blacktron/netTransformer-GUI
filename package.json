@@ -8,6 +8,7 @@
   "dependencies": {
     "material-ui": "^0.15.4",
     "react": "^15.3.2",
+    "react-bootstrap-table": "^2.5.5",
     "react-dom": "^15.3.2",
     "react-tap-event-plugin": "^1.0.0"
   },
