@@ -8,8 +8,16 @@ function getConnections(cb) {
 }
 
 function createConnection(name, cb) {
-    return axios.post(`/wsitransformer/api/connections/`, '"'+name+'"'
-    ).then(checkStatus);
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    console.log(name);
+    return axios.post(`/wsitransformer/api/connections/`, '"'+name+'"', config)
+        .then(checkStatus);
+}
+
+function deleteConnection(name, cb) {
+    console.log(name);
+    return axios.delete(`/wsitransformer/api/connections/${name}`)
+        .then(checkStatus);
 }
 
 function getConnectionParams(name, cb) {
@@ -36,5 +44,11 @@ function parseJSON(response) {
     return response.data;
 }
 
-const ConnectionDetailsClient = { getConnections, getConnectionParams, createConnection };
+const ConnectionDetailsClient = {
+    getConnections,
+    getConnectionParams,
+    createConnection,
+    deleteConnection
+};
+
 export default ConnectionDetailsClient;

@@ -56,29 +56,24 @@ class ConnectionDetailsList extends Component {
     };
 
     onAfterInsertRow(row) {
-        let newRowStr = '';
-        for (const prop in row) {
-            if (row.hasOwnProperty(prop)) {
-                 newRowStr += prop + ': ' + row[prop] + ' \n';
-            }
-        }
-//        alert('The new row is:\n ' + newRowStr);
-	this.props.client.createConnection(newRowStr);
+	    this.props.client.createConnection(row.name.trim());
     };
 
     onAfterDeleteRow(rowKeys) {
-        alert('The rowkey you drop: ' + rowKeys);
+        for (var i = 0; i < rowKeys.length; i++) {
+            this.props.client.deleteConnection(rowKeys[i].trim());
+        }
     };
 
     render() {
-	var options = {
-	  afterDeleteRow: this.onAfterDeleteRow,
-          afterInsertRow: this.onAfterInsertRow.bind(this)
-	};
+        var options = {
+            afterDeleteRow: this.onAfterDeleteRow.bind(this),
+            afterInsertRow: this.onAfterInsertRow.bind(this)
+        };
         var cellEditProp = {
             mode: "click",
             blurToSave: true,
-            afterSaveCell: this.onAfterSaveCell
+            afterSaveCell: this.onAfterSaveCell.bind(this)
         };
         var selectRowProp = {
             mode: "radio",
@@ -118,10 +113,18 @@ class ConnectionDetailsParams extends Component {
 
     loadConnectionParamsFromServer(connName){
         this.props.client.getConnectionParams(connName, (connParams) => {
-            var arr = Object.keys(connParams.params).map(function(k) { return { name: k, value: connParams.params[k] }});
-            this.setState({
-                connParams: {connectionType: connParams.connectionType, params: arr}
-            });
+            if (connParams.params != null) {
+                var arr = Object.keys(connParams.params).map(function (k) {
+                    return {name: k, value: connParams.params[k]}
+                });
+                this.setState({
+                    connParams: {connectionType: connParams.connectionType, params: arr}
+                });
+            } else {
+                this.setState({
+                    connParams: {connectionType: null, params: []}
+                });
+            }
         });
     };
 
