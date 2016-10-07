@@ -23,9 +23,16 @@
   to { transform: rotate(360deg); }
 }
 
+.ConnectionDetailsBox {
+  width: 1000px;
+}
 .connectionDetails_names {
   width: 300px;
+  float: left;
+  margin: 20px;
 }
 .connectionDetails_props {
   width: 600px;
+  float: left;
+  margin: 20px;
 }

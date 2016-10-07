@@ -42,17 +42,43 @@ class ConnectionDetailsList extends Component {
     }
     componentDidMount() {
         this.loadConnectionDetailFromServer();
-        setInterval(this.loadConnectionDetailFromServer, this.props.pollInterval);
+        //setInterval(this.loadConnectionDetailFromServer, this.props.pollInterval);
     }
 
     handleRequestChange = (event) => {
         this.props.onChange(event.name);
     };
+
+    onAfterSaveCell(row, cellName, cellValue){
+        console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
+        console.log("Thw whole row :");
+        console.log(row);
+    };
+
+    onAfterInsertRow(row) {
+        let newRowStr = '';
+        for (const prop in row) {
+            if (row.hasOwnProperty(prop)) {
+                 newRowStr += prop + ': ' + row[prop] + ' \n';
+            }
+        }
+//        alert('The new row is:\n ' + newRowStr);
+	this.props.client.createConnection(newRowStr);
+    };
+
+    onAfterDeleteRow(rowKeys) {
+        alert('The rowkey you drop: ' + rowKeys);
+    };
+
     render() {
+	var options = {
+	  afterDeleteRow: this.onAfterDeleteRow,
+          afterInsertRow: this.onAfterInsertRow.bind(this)
+	};
         var cellEditProp = {
             mode: "click",
             blurToSave: true,
-            afterSaveCell: onAfterSaveCell
+            afterSaveCell: this.onAfterSaveCell
         };
         var selectRowProp = {
             mode: "radio",
@@ -71,6 +97,7 @@ class ConnectionDetailsList extends Component {
                                 insertRow={true}
                                 deleteRow={true}
                                 selectRow={selectRowProp}
+			        options={ options }
                 >
                     <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
                 </BootstrapTable>
@@ -98,34 +125,58 @@ class ConnectionDetailsParams extends Component {
         });
     };
 
+    onAfterSaveCell(row, cellName, cellValue){
+        console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
+        console.log("Thw whole row :");
+        console.log(row);
+    };
+
+    onAfterInsertRow(row) {
+        let newRowStr = '';
+        for (const prop in row) {
+            if (row.hasOwnProperty(prop)) {
+                 newRowStr += prop + ': ' + row[prop] + ' \n';
+            }
+        }
+        alert('The new row is:\n ' + newRowStr);
+    };
+
+    onAfterDeleteRow(rowKeys) {
+        alert('The rowkey you drop: ' + rowKeys);
+    };
+
     render() {
+	var options = {
+	  afterDeleteRow: this.onAfterDeleteRow,
+          afterInsertRow: this.onAfterInsertRow
+	};
         var cellEditProp = {
             mode: "click",
             blurToSave: true,
-            afterSaveCell: onAfterSaveCell
+            afterSaveCell: this.onAfterSaveCell
         };
         var selectRowProp = {
             mode: "checkbox",
             clickToSelect: true
         };
         return (
-        <BootstrapTable data={this.state.connParams.params}
+        <div className="connectionDetails_props">
+               <b>Connection params</b>
+               <BootstrapTable data={this.state.connParams.params}
                         striped={true}
-                        hover={true}
+                	hover={true}
                         cellEdit={cellEditProp}
                         insertRow={true}
                         deleteRow={true}
                         selectRow={selectRowProp}
-            >
-            <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
-            <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
-        </BootstrapTable>
+			options={ options }
+                >
+                <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+                <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
+            </BootstrapTable>
+        </div>
         )
     }
 }
-function onAfterSaveCell(row, cellName, cellValue){
-    console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
-    console.log("Thw whole row :");
-    console.log(row);
-}
+
 export default ConnectionDetailsBox;

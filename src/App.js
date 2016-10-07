@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import 'react-bootstrap-table/cssqaa/react-bootstrap-table-all.min.css';
 import ConnectionDetailsBox from './ConnectionDetailsBox';
 import ConnectionDetailsClient from './ConnectionDetailsClient';
 

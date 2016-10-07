@@ -1,20 +1,24 @@
-import fetch from 'isomorphic-fetch';
+import axios from 'axios';
 
 function getConnections(cb) {
-    return fetch(`/wsitransformer/api/connections/`, {
-        accept: 'application/json'
+    return axios.get(`/wsitransformer/api/connections/`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
+}
+
+function createConnection(name, cb) {
+    return axios.post(`/wsitransformer/api/connections/`, '"'+name+'"'
+    ).then(checkStatus);
 }
 
 function getConnectionParams(name, cb) {
-    return fetch(`/wsitransformer/api/connections/${name}`, {
-        accept: 'application/json'
+    return axios.get(`/wsitransformer/api/connections/${name}`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
 }
+
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -23,14 +27,14 @@ function checkStatus(response) {
         const error = new Error(`HTTP Error ${response.statusText}`);
         error.status = response.statusText;
         error.response = response;
-        console.log(error); // eslint-disable-line no-console
+        console.log("---->"+error); // eslint-disable-line no-console
         throw error;
     }
 }
 
 function parseJSON(response) {
-    return response.json();
+    return response.data;
 }
 
-const ConnectionDetailsClient = { getConnections, getConnectionParams };
+const ConnectionDetailsClient = { getConnections, getConnectionParams, createConnection };
 export default ConnectionDetailsClient;
