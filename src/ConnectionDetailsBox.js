@@ -136,7 +136,7 @@ class ConnectionDetailsParams extends Component {
             } else {
                 this.setState({
                     visibility: 'visible',
-                    connName: null,
+                    connName: connName,
                     connParams: {connectionType: null, params: []}
                 });
             }
