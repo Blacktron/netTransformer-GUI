@@ -27,6 +27,18 @@ function getConnectionParams(name, cb) {
         .then(cb);
 }
 
+function createConnectionParam(connectionName, paramName, paramValue, cb) {
+    const config = { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } };
+    return axios.post(`/wsitransformer/api/connections/${connectionName}/params/`,
+        jsonToQueryString({paramName: paramName, paramValue: paramValue}), config)
+        .then(checkStatus);
+}
+
+function deleteConnectionParam(connectionName, paramName, cb) {
+    console.log(name);
+    return axios.delete(`/wsitransformer/api/connections/${connectionName}/params/${paramName}`)
+        .then(checkStatus);
+}
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -44,11 +56,21 @@ function parseJSON(response) {
     return response.data;
 }
 
+function jsonToQueryString(json) {
+    return Object.keys(json).map(function(key) {
+            return encodeURIComponent(key) + '=' +
+                encodeURIComponent(json[key]);
+        }).join('&');
+}
+
 const ConnectionDetailsClient = {
     getConnections,
     getConnectionParams,
     createConnection,
-    deleteConnection
+    deleteConnection,
+    createConnectionParam,
+    deleteConnectionParam
+    
 };
 
 export default ConnectionDetailsClient;
