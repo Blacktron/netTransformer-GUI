@@ -9,19 +9,17 @@ function getConnections(cb) {
 
 function createConnection(name, cb) {
     const config = { headers: { 'Content-Type': 'application/json' } };
-    console.log(name);
     return axios.post(`/wsitransformer/api/connections/`, '"'+name+'"', config)
         .then(checkStatus);
 }
 
 function deleteConnection(name, cb) {
-    console.log(name);
     return axios.delete(`/wsitransformer/api/connections/${name}`)
         .then(checkStatus);
 }
 
-function getConnectionParams(name, cb) {
-    return axios.get(`/wsitransformer/api/connections/${name}`, {
+function getConnectionParams(connectionName, cb) {
+    return axios.get(`/wsitransformer/api/connections/${connectionName}`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
@@ -77,14 +75,13 @@ function jsonToQueryString(json) {
 
 const ConnectionDetailsClient = {
     getConnections,
-    getConnectionParams,
     createConnection,
     deleteConnection,
+    getConnectionParams,
     createConnectionParam,
     deleteConnectionParam,
-    updateConnectionType,
-    updateConnectionParam
-    
+    updateConnectionParam,
+    updateConnectionType
 };
 
 export default ConnectionDetailsClient;

@@ -11,11 +11,7 @@ class ConnectionDetailsBox extends Component {
         };
     }
     connectionListChanged = (name) => {
-        if (name != null) {
-            this.refs.params.loadConnectionParamsFromServer(name);
-        } else {
-            this.refs.params.hide();
-        }
+        this.refs.params.loadConnectionParamsFromServer(name);
     };
     render() {
         return (
@@ -92,7 +88,7 @@ class ConnectionDetailsList extends Component {
         };
 
         return (
-            <div className="connectionDetails_names">
+            <div className="ConnectionDetails_names">
                 <b>Connection Name</b>
                 <BootstrapTable  data={this.state.conn}
                                 striped={true}
@@ -114,7 +110,6 @@ class ConnectionDetailsParams extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visibility: 'hidden',
             connName: null,
             connParams: {connectionType: "", params: []}
         };
@@ -123,43 +118,36 @@ class ConnectionDetailsParams extends Component {
     };
 
     loadConnectionParamsFromServer(connName){
-        this.props.client.getConnectionParams(connName, (connParams) => {
-            if (connParams.params != null) {
-                var arr = Object.keys(connParams.params).map(function (k) {
-                    return {name: k, value: connParams.params[k]}
-                });
-                this.setState({
-                    visibility: 'visible',
-                    connName: connName,
-                    connParams: {connectionType: connParams.connectionType, params: arr}
-                });
-            } else {
-                this.setState({
-                    visibility: 'visible',
-                    connName: connName,
-                    connParams: {connectionType: null, params: []}
-                });
-            }
-        });
+        if (connName !=  null) {
+            this.props.client.getConnectionParams(connName, (connParams) => {
+                if (connParams.params != null) {
+                    var arr = Object.keys(connParams.params).map(function (k) {
+                        return {name: k, value: connParams.params[k]}
+                    });
+                    this.setState({
+                        connName: connName,
+                        connParams: {connectionType: connParams.connectionType, params: arr}
+                    });
+                } else {
+                    this.setState({
+                        connName: connName,
+                        connParams: {connectionType: null, params: []}
+                    });
+                }
+            });
+        } else {
+            this.setState({
+                connName: null,
+                connParams: {connectionType: "", params: []}
+            });
+        }
     };
-
-    hide() {
-        var state = this.state;
-        state.visibility='hidden';
-        this.setState(state);
-    };
-
-    show() {
-        var state = this.state;
-        state.visibility='visible';
-        this.setState(state);
-    };
-
+    
     beforeSaveCell(row, cellName, cellValue){
         console.log("Before Save cell '"+cellName+"' with value '"+cellValue+"'");
         console.log("Thw whole row :");
         console.log(row);
-        this.props.client.updateConnectionParam(this.state.connName, cellName, cellValue);
+        this.props.client.updateConnectionParam(this.state.connName, row.name, cellValue);
     };
 
     onAfterInsertRow(row) {
@@ -200,9 +188,10 @@ class ConnectionDetailsParams extends Component {
             { value: 'icmp', label: 'icmp' }
 
         ];
-
+        var visibility = this.state.connName == null ? 'hidden' : 'visible';
+        
         return (
-        <div className="connectionDetails_props" style={{visibility: this.state.visibility}}>
+        <div className="ConnectionDetails_props" style={{visibility: visibility}}>
             <b>Connection type</b>
             <Select
                 name="form-field-name"

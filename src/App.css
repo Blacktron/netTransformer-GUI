@@ -26,12 +26,26 @@
 .ConnectionDetailsBox {
   width: 1100px;
 }
-.connectionDetails_names {
+.ConnectionDetails_names {
   width: 400px;
   float: left;
   margin: 20px;
 }
-.connectionDetails_props {
+.ConnectionDetails_props {
+  width: 600px;
+  float: left;
+  margin: 20px;
+}
+
+.ResourceManagerBox {
+  width: 1100px;
+}
+.ResourceManager_names {
+  width: 400px;
+  float: left;
+  margin: 20px;
+}
+.ResourceManager_props {
   width: 600px;
   float: left;
   margin: 20px;
