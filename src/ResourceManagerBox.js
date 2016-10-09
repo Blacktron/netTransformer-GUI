@@ -111,6 +111,7 @@ class ResourceConnectionParams extends Component {
         this.state = {
             resourceName: null,
             connectionTypes: [],
+            selectionParams: [],
             connParams: {connectionType: "", params: []}
         };
         // Functions must be bound manually with ES6 classes
@@ -119,6 +120,7 @@ class ResourceConnectionParams extends Component {
 
     loadConnectionTypeAndParamsFromServer(resourceName){
         if (resourceName != null) {
+            this.loadSelectionParamsFromServer(resourceName);
             this.props.client.getConnectionTypes(resourceName, (connTypes) => {
                 if (connTypes.length > 0) {
                     var connType = connTypes[0];
@@ -127,7 +129,8 @@ class ResourceConnectionParams extends Component {
                     this.setState({
                         resourceName: resourceName,
                         connectionTypes: [],
-                        connParams: {connectionType: "", params: []}
+                        selectionParams: this.state.selectionParams,
+                        connParams: {connectionType: null, params: []}
                     });
                 }
             });
@@ -135,6 +138,7 @@ class ResourceConnectionParams extends Component {
             this.setState({
                 resourceName: null,
                 connectionTypes: [],
+                selectionParams: [],
                 connParams: {connectionType: null, params: []}
             });
         }
@@ -149,15 +153,31 @@ class ResourceConnectionParams extends Component {
                 this.setState({
                     resourceName: resourceName,
                     connectionTypes: connTypes,
+                    selectionParams: this.state.selectionParams,
                     connParams: {connectionType: connType, params: arr}
                 });
             } else {
                 this.setState({
                     resourceName: resourceName,
                     connectionTypes: connTypes,
+                    selectionParams: this.state.selectionParams,
                     connParams: {connectionType: connType, params: []}
                 });
             }
+        });
+    };
+
+    loadSelectionParamsFromServer(resourceName){
+        this.props.client.getSelectionParams(resourceName, (selectionParams) => {
+            var arr = Object.keys(selectionParams).map(function (k) {
+                return {name: selectionParams[k].name, value: selectionParams[k].value}
+            });
+            this.setState({
+                resourceName: this.state.resourceName,
+                connectionTypes: this.state.connectionTypes,
+                selectionParams: arr,
+                connParams: this.state.connParams
+            });
         });
     };
 
@@ -166,6 +186,13 @@ class ResourceConnectionParams extends Component {
         console.log("Thw whole row :");
         console.log(row);
         this.props.client.updateConnectionParam(this.state.resourceName, this.state.connParams.connectionType, row.name, cellValue);
+    };
+
+    beforeSelectionParamSaveCell(row, cellName, cellValue){
+        console.log("Before Save cell '"+cellName+"' with value '"+cellValue+"'");
+        console.log("Thw whole row :");
+        console.log(row);
+        this.props.client.updateSelectionParam(this.state.resourceName, row.name, cellValue);
     };
 
     onAfterInsertRow(row) {
@@ -186,6 +213,7 @@ class ResourceConnectionParams extends Component {
         this.setState({
             resourceName: this.state.resourceName,
             connectionTypes: connTypes,
+            selectionParams: [],
             connParams: {connectionType: connType, params: []}
         });
     };
@@ -203,7 +231,40 @@ class ResourceConnectionParams extends Component {
             this.setState({
                 resourceName: this.state.resourceName,
                 connectionTypes: connTypes,
+                selectionParams: [],
                 connParams: {connectionType: null, params: []}
+            });
+        }
+    };
+    onSelectionParamsAfterInsertRow(row) {
+        var name = row.name.trim();
+        var value = row.value.trim();
+        this.props.client.createSelectionParam(this.state.resourceName, name, value);
+        var selectionParams = this.state.selectionParams;
+        selectionParams.push({name: name, value: value});
+        this.setState({
+            resourceName: this.state.resourceName,
+            connectionTypes: this.state.connectionTypes,
+            selectionParams: selectionParams,
+            connParams: this.state.connParams
+        });
+    };
+
+    onSelectionParamsAfterDeleteRow(rowKeys) {
+        for (var j = 0; j < rowKeys.length; j++) {
+            var name = rowKeys[j].trim();
+            this.props.client.deleteSelectionParam(this.state.resourceName, name);
+            var selectionParams = this.state.selectionParams;
+            for(var i = selectionParams.length - 1; i >= 0; i--) {
+                if(selectionParams[i].name === name) {
+                    selectionParams.splice(i, 1);
+                }
+            }
+            this.setState({
+                resourceName: this.state.resourceName,
+                connectionTypes: this.state.connectionTypes,
+                selectionParams: selectionParams,
+                connParams: this.state.connParams
             });
         }
     };
@@ -212,11 +273,14 @@ class ResourceConnectionParams extends Component {
         this.loadConnectionParamsFromServer(this.state.resourceName, this.state.connectionTypes, event.value);
     };
 
-
     render() {
         var options = {
             afterDeleteRow: this.onAfterDeleteRow.bind(this),
             afterInsertRow: this.onAfterInsertRow.bind(this)
+        };
+        var selectionParamsOptions = {
+            afterDeleteRow: this.onSelectionParamsAfterDeleteRow.bind(this),
+            afterInsertRow: this.onSelectionParamsAfterInsertRow.bind(this)
         };
         var connTypeOptions = {
             afterDeleteRow: this.onConnTypeAfterDeleteRow.bind(this),
@@ -227,12 +291,21 @@ class ResourceConnectionParams extends Component {
             blurToSave: true,
             beforeSaveCell: this.beforeSaveCell.bind(this)
         };
-        var sconnTypeSelectRowProp = {
+        var selectionParamsCellEditProp = {
+            mode: "click",
+            blurToSave: true,
+            beforeSaveCell: this.beforeSelectionParamSaveCell.bind(this)
+        };
+        var connTypeSelectRowProp = {
             mode: "radio",
             clickToSelect: true,
             bgColor: "rgb(238, 193, 213)",
             selected: [this.state.connParams.connectionType],
             onSelect: this.onConnectionTypeChange.bind(this)
+        };
+        var selectionParamsSelectRowProp = {
+            mode: "checkbox",
+            clickToSelect: true
         };
         var selectRowProp = {
             mode: "checkbox",
@@ -247,12 +320,26 @@ class ResourceConnectionParams extends Component {
 
         return (
         <div className="ResourceManager_props" style={{visibility: visibility}}>
+            <br/>
+            <b>Selection params</b>
+            <BootstrapTable data={this.state.selectionParams}
+                            striped={true}
+                            hover={true}
+                            cellEdit={selectionParamsCellEditProp}
+                            insertRow={true}
+                            deleteRow={true}
+                            selectRow={selectionParamsSelectRowProp}
+                            options={ selectionParamsOptions }
+            >
+                <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+                <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
+            </BootstrapTable>
             <BootstrapTable data={connectionTypesArr}
                             striped={true}
                             hover={true}
                             insertRow={true}
                             deleteRow={true}
-                            selectRow={sconnTypeSelectRowProp}
+                            selectRow={connTypeSelectRowProp}
                             options={ connTypeOptions }
             >
                 <TableHeaderColumn isKey={true} dataField="value">Connection type</TableHeaderColumn>

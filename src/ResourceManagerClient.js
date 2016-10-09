@@ -62,6 +62,31 @@ function deleteConnectionParam(resourceName, connectionType, paramName, cb) {
         .then(checkStatus);
 }
 
+function getSelectionParams(resourceName, cb) {
+    return axios.get(`/wsitransformer/api/resource/${resourceName}/selection/param`, {
+    }).then(checkStatus)
+        .then(parseJSON)
+        .then(cb);
+}
+
+function createSelectionParam(resourceName, paramName, paramValue, cb) {
+    const config = { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } };
+    return axios.post(`/wsitransformer/api/resource/${resourceName}/selection/param`,
+        jsonToQueryString({paramName: paramName, paramValue: paramValue}), config)
+        .then(checkStatus);
+}
+
+function updateSelectionParam(resourceName, paramName, paramValue, cb) {
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    return axios.put(`/wsitransformer/api/resource/${resourceName}/selection/param/${paramName}`,'"'+paramValue+'"', config)
+        .then(checkStatus);
+}
+
+function deleteSelectionParam(resourceName, paramName, cb) {
+    return axios.delete(`/wsitransformer/api/resource/${resourceName}/selection/param/${paramName}`)
+        .then(checkStatus);
+}
+
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return response;
@@ -96,7 +121,11 @@ const ResourceManagerClient = {
     updateConnectionParam,
     getConnectionTypes,
     createConnectionType,
-    deleteConnectionType
+    deleteConnectionType,
+    getSelectionParams,
+    createSelectionParam,
+    updateSelectionParam,
+    deleteSelectionParam
 };
 
 export default ResourceManagerClient;
