@@ -34,9 +34,20 @@ function createConnectionParam(connectionName, paramName, paramValue, cb) {
         .then(checkStatus);
 }
 
+function updateConnectionParam(connectionName, paramName, paramValue, cb) {
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    return axios.put(`/wsitransformer/api/connections/${connectionName}/params/${paramName}`,'"'+paramValue+'"', config)
+        .then(checkStatus);
+}
+
 function deleteConnectionParam(connectionName, paramName, cb) {
-    console.log(name);
     return axios.delete(`/wsitransformer/api/connections/${connectionName}/params/${paramName}`)
+        .then(checkStatus);
+}
+
+function updateConnectionType(connectionName, connectionType, cb) {
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    return axios.put(`/wsitransformer/api/connections/${connectionName}/type`, '"'+connectionType+'"', config)
         .then(checkStatus);
 }
 
@@ -48,6 +59,7 @@ function checkStatus(response) {
         error.status = response.statusText;
         error.response = response;
         console.log("---->"+error); // eslint-disable-line no-console
+        alert(error);
         throw error;
     }
 }
@@ -69,7 +81,9 @@ const ConnectionDetailsClient = {
     createConnection,
     deleteConnection,
     createConnectionParam,
-    deleteConnectionParam
+    deleteConnectionParam,
+    updateConnectionType,
+    updateConnectionParam
     
 };
 

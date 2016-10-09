@@ -159,12 +159,7 @@ class ConnectionDetailsParams extends Component {
         console.log("Before Save cell '"+cellName+"' with value '"+cellValue+"'");
         console.log("Thw whole row :");
         console.log(row);
-    };
-
-    onAfterSaveCell(row, cellName, cellValue){
-        console.log("After Save cell '"+cellName+"' with value '"+cellValue+"'");
-        console.log("Thw whole row :");
-        console.log(row);
+        this.props.client.updateConnectionParam(this.state.connName, cellName, cellValue);
     };
 
     onAfterInsertRow(row) {
@@ -180,6 +175,7 @@ class ConnectionDetailsParams extends Component {
     onConnectionTypeChange(event) {
         var state = this.state;
         state.connParams.connectionType=event.value;
+        this.props.client.updateConnectionType(this.state.connName, event.value);
         this.setState(state);
     };
 
@@ -192,7 +188,6 @@ class ConnectionDetailsParams extends Component {
             mode: "click",
             blurToSave: true,
             beforeSaveCell: this.beforeSaveCell.bind(this),
-            afterSaveCell: this.onAfterSaveCell
         };
         var selectRowProp = {
             mode: "checkbox",
@@ -200,7 +195,10 @@ class ConnectionDetailsParams extends Component {
         };
         var selectOptions = [
             { value: 'ssh', label: 'ssh' },
-            { value: 'snmp', label: 'snmp' }
+            { value: 'snmp', label: 'snmp' },
+            { value: 'subnet', label: 'subnet' },
+            { value: 'icmp', label: 'icmp' }
+
         ];
 
         return (
