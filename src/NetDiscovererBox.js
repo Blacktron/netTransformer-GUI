@@ -27,7 +27,8 @@ class VersionList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            versions: []
+            versions: [],
+            version: null
         };
         // Functions must be bound manually with ES6 classes
         this.loadVersionsFromServer = this.loadVersionsFromServer.bind(this);
@@ -36,7 +37,8 @@ class VersionList extends Component {
         this.props.client.getVersions((versions) => {
             var arr = Object.keys(versions).map(function(k) { return {name: versions[k] }});
             this.setState({
-                versions: arr
+                versions: arr,
+                version: null
             });
         });
     }
@@ -53,8 +55,8 @@ class VersionList extends Component {
 	    this.props.client.createVersion(function (version) {
             self.state.versions.push({name: version.data});
             // self.refs.table.handleAddRow(version);
-            self.props.onChange();
-            self.setState({versions: self.state.versions});
+            self.setState({versions: self.state.versions, version: version.data});
+            self.props.onChange(version.data);
         });
     };
 
@@ -70,8 +72,8 @@ class VersionList extends Component {
                     versions.splice(i, 1);
                 }
             }
-            self.props.onChange();
-            self.setState({versions: versions});
+            self.props.onChange(null);
+            self.setState({versions: versions, version: null});
         }
     };
 
@@ -80,6 +82,7 @@ class VersionList extends Component {
             mode: "radio",
             clickToSelect: true,
             bgColor: "rgb(238, 193, 213)",
+            selected: [this.state.version],
             onSelect: this.handleRequestChange
         };
 
@@ -168,8 +171,9 @@ class Discoverer extends Component {
 
     render() {
         var visibility = this.state.version == null ? 'hidden' : 'visible';
-        const style = {
-            margin: 12
+        var style = {
+            margin: 4,
+            visibility: visibility
         };
         return (
         <div className="Version_props" style={{visibility: visibility}}>
@@ -181,7 +185,7 @@ class Discoverer extends Component {
             />
             <RaisedButton label={this.state.discoveryStatus === "PAUSED" ? "Resume" : "Pause"}
                           style={style}
-                          disabled={this.state.discoveryStatus !== "STARTED" || this.state.discoveryStatus !== "PAUSED"}
+                          disabled={this.state.discoveryStatus !== "STARTED" && this.state.discoveryStatus !== "PAUSED"}
                           onClick={this.state.discoveryStatus === "PAUSED" ?
                           this.resumeDiscovery.bind(this) : this.pauseDiscovery.bind(this)}
             />

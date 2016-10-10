@@ -32,8 +32,7 @@ function createDiscoverer(version, cb) {
 }
 
 function updateDiscoverer(version, operation, cb) {
-    const config = { headers: { 'Content-Type': 'application/json' } };
-    return axios.put(`/wsitransformer/api/discovery/${version}/discoverer/`,'"'+operation+'"', config)
+    return axios.put(`/wsitransformer/api/discovery/${version}/discoverer?operation=${operation}`)
         .then(checkStatus);
 }
 
