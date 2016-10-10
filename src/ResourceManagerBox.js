@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import 'react-select/dist/react-select.css';
-
 class ResourceManagerBox extends Component {
     constructor(props) {
         super(props);
