@@ -5,6 +5,8 @@ import ConnectionDetailsBox from './ConnectionDetailsBox';
 import ConnectionDetailsClient from './ConnectionDetailsClient';
 import ResourceManagerBox from './ResourceManagerBox';
 import ResourceManagerClient from './ResourceManagerClient';
+import NetDiscovererBox from './NetDiscovererBox';
+import NetDiscovererClient from './NetDiscovererClient';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
@@ -50,6 +52,11 @@ class App extends Component {
         component: (<ResourceManagerBox client={ResourceManagerClient} pollInterval={2000}/>)
     });
 
+    handleDiscoverySelected = () => this.setState({
+        open: false,
+        component: (<NetDiscovererBox client={NetDiscovererClient} pollInterval={2000}/>)
+    });
+
     render() {
         return (
             <MuiThemeProvider muiTheme={lightMuiTheme}>
@@ -66,6 +73,7 @@ class App extends Component {
                         <MenuItem onTouchTap={this.handleClose}><IconButton><ArrowBackIcon /></IconButton></MenuItem>
                         <MenuItem onTouchTap={this.handleConnDetailsSelected}>Connections</MenuItem>
                         <MenuItem onTouchTap={this.handleResourcesSelected}>Resources</MenuItem>
+                        <MenuItem onTouchTap={this.handleDiscoverySelected}>Discovery</MenuItem>
                     </Drawer>
                     { this.state.component }
                 </div>
