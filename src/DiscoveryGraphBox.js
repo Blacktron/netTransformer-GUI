@@ -2,6 +2,7 @@ import {default as React, Component} from 'react';
 import VersionClient from './VersionClient';
 import DiscoveryGraphClient from './DiscoveryGraphClient';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { Grid, Row, Col } from 'react-bootstrap';
 
 
 const vis = require('vis');
@@ -19,12 +20,19 @@ class DiscoveryGraphBox extends Component {
 
     render() {
         return (
-            <div className="DiscoveryGraphBox">
-                <VersionList onChange={this.versionListChanged.bind(this)}>
-                </VersionList>
-                <DiscoveryGraph ref="discoveryGraph">
-                </DiscoveryGraph>
-            </div>
+            <Grid>
+                <Row className="show-grid">
+                    <Col sm={2} md={4} lg={4}>
+
+                        <VersionList onChange={this.versionListChanged.bind(this)}>
+                        </VersionList>
+                    </Col>
+                    <Col sm={4} md={8} lg={8}>
+                        <DiscoveryGraph ref="discoveryGraph">
+                        </DiscoveryGraph>
+                    </Col>
+                </Row>
+            </Grid>
         );
     }
 }
@@ -144,13 +152,13 @@ class DiscoveryGraph extends Component {
         };
     }
 
-    loadGraphFromServer(version){
-        if (version !=  null) {
+    loadGraphFromServer(version) {
+        if (version != null) {
             DiscoveryGraphClient.getNetwork(version, (network) => {
-                var nodes = Object.keys(network.graphmlNodes).map(function(k) {
+                var nodes = Object.keys(network.graphmlNodes).map(function (k) {
                     return {id: network.graphmlNodes[k].id, label: network.graphmlNodes[k].id}
                 });
-                var edges = Object.keys(network.graphmlEdges).map(function(k) {
+                var edges = Object.keys(network.graphmlEdges).map(function (k) {
                     return {from: network.graphmlEdges[k].fromNode, to: network.graphmlEdges[k].toNode}
                 });
 

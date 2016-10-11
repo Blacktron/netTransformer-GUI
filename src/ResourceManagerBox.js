@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { Grid, Row, Col } from 'react-bootstrap';
 
 class ResourceManagerBox extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-        };
+        this.state = {};
     }
+
     resourceListChanged = (name) => {
         this.refs.params.loadConnectionTypeAndParamsFromServer(name);
     };
+
     render() {
         return (
-            <div className="ResourceManagerBox">
-                <ResourceList client={this.props.client} pollInterval={this.props.pollInterval} onChange={this.resourceListChanged.bind(this)}>
-                </ResourceList>
-                <ResourceConnectionParams client={this.props.client} pollInterval={this.props.pollInterval} ref="params">
-                </ResourceConnectionParams>
-            </div>
+            <Grid>
+                <Row className="show-grid">
+                    <Col sm={2} md={4} lg={4}>
+                        <ResourceList client={this.props.client} pollInterval={this.props.pollInterval}
+                                      onChange={this.resourceListChanged.bind(this)}>
+                        </ResourceList>
+                    </Col>
+                    <Col sm={2} md={4} lg={4}>
+                        <ResourceConnectionParams client={this.props.client} pollInterval={this.props.pollInterval}
+                                                  ref="params">
+                        </ResourceConnectionParams>
+                    </Col>
+                </Row>
+            </Grid>
         )
     }
 }
@@ -31,14 +41,18 @@ class ResourceList extends Component {
         // Functions must be bound manually with ES6 classes
         this.loadResourceFromServer = this.loadResourceFromServer.bind(this);
     }
-    loadResourceFromServer(){
+
+    loadResourceFromServer() {
         this.props.client.getResource((resource) => {
-            var arr = Object.keys(resource).map(function(k) { return {name: resource[k] }});
+            var arr = Object.keys(resource).map(function (k) {
+                return {name: resource[k]}
+            });
             this.setState({
                 resource: arr
             });
         });
     }
+
     componentDidMount() {
         this.loadResourceFromServer();
         //setInterval(this.loadResourceFromServer, this.props.pollInterval);
@@ -49,14 +63,14 @@ class ResourceList extends Component {
     };
 
     // currently it is not used, because can not edin key column
-    onAfterSaveCell(row, cellName, cellValue){
-        console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
+    onAfterSaveCell(row, cellName, cellValue) {
+        console.log("Save cell '" + cellName + "' with value '" + cellValue + "'");
         console.log("Thw whole row :");
         console.log(row);
     };
 
     onAfterInsertRow(row) {
-	    this.props.client.createResource(row.name.trim());
+        this.props.client.createResource(row.name.trim());
         this.props.onChange();
     };
 
@@ -87,14 +101,14 @@ class ResourceList extends Component {
         return (
             <div className="ResourceManager_names">
                 <b>Resource Name</b>
-                <BootstrapTable  data={this.state.resource}
+                <BootstrapTable data={this.state.resource}
                                 striped={true}
                                 hover={true}
                                 cellEdit={cellEditProp}
                                 insertRow={true}
                                 deleteRow={true}
                                 selectRow={selectRowProp}
-			                    options={ options }
+                                options={ options }
                 >
                     <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
                 </BootstrapTable>
@@ -116,7 +130,7 @@ class ResourceConnectionParams extends Component {
         this.loadConnectionParamsFromServer = this.loadConnectionParamsFromServer.bind(this);
     };
 
-    loadConnectionTypeAndParamsFromServer(resourceName){
+    loadConnectionTypeAndParamsFromServer(resourceName) {
         if (resourceName != null) {
             this.loadSelectionParamsFromServer(resourceName);
             this.props.client.getConnectionTypes(resourceName, (connTypes) => {
@@ -142,7 +156,7 @@ class ResourceConnectionParams extends Component {
         }
     };
 
-    loadConnectionParamsFromServer(resourceName, connTypes, connType){
+    loadConnectionParamsFromServer(resourceName, connTypes, connType) {
         this.props.client.getConnectionParams(resourceName, connType, (connParams) => {
             if (connParams != null) {
                 var arr = Object.keys(connParams).map(function (k) {
@@ -165,7 +179,7 @@ class ResourceConnectionParams extends Component {
         });
     };
 
-    loadSelectionParamsFromServer(resourceName){
+    loadSelectionParamsFromServer(resourceName) {
         this.props.client.getSelectionParams(resourceName, (selectionParams) => {
             var arr = Object.keys(selectionParams).map(function (k) {
                 return {name: selectionParams[k].name, value: selectionParams[k].value}
@@ -179,15 +193,15 @@ class ResourceConnectionParams extends Component {
         });
     };
 
-    beforeSaveCell(row, cellName, cellValue){
-        console.log("Before Save cell '"+cellName+"' with value '"+cellValue+"'");
+    beforeSaveCell(row, cellName, cellValue) {
+        console.log("Before Save cell '" + cellName + "' with value '" + cellValue + "'");
         console.log("Thw whole row :");
         console.log(row);
         this.props.client.updateConnectionParam(this.state.resourceName, this.state.connParams.connectionType, row.name, cellValue);
     };
 
-    beforeSelectionParamSaveCell(row, cellName, cellValue){
-        console.log("Before Save cell '"+cellName+"' with value '"+cellValue+"'");
+    beforeSelectionParamSaveCell(row, cellName, cellValue) {
+        console.log("Before Save cell '" + cellName + "' with value '" + cellValue + "'");
         console.log("Thw whole row :");
         console.log(row);
         this.props.client.updateSelectionParam(this.state.resourceName, row.name, cellValue);
@@ -221,8 +235,8 @@ class ResourceConnectionParams extends Component {
             var connType = rowKeys[j].trim();
             this.props.client.deleteConnectionType(this.state.resourceName, connType);
             var connTypes = this.state.connectionTypes;
-            for(var i = connTypes.length - 1; i >= 0; i--) {
-                if(connTypes[i] === connType) {
+            for (var i = connTypes.length - 1; i >= 0; i--) {
+                if (connTypes[i] === connType) {
                     connTypes.splice(i, 1);
                 }
             }
@@ -234,6 +248,7 @@ class ResourceConnectionParams extends Component {
             });
         }
     };
+
     onSelectionParamsAfterInsertRow(row) {
         var name = row.name.trim();
         var value = row.value.trim();
@@ -253,8 +268,8 @@ class ResourceConnectionParams extends Component {
             var name = rowKeys[j].trim();
             this.props.client.deleteSelectionParam(this.state.resourceName, name);
             var selectionParams = this.state.selectionParams;
-            for(var i = selectionParams.length - 1; i >= 0; i--) {
-                if(selectionParams[i].name === name) {
+            for (var i = selectionParams.length - 1; i >= 0; i--) {
+                if (selectionParams[i].name === name) {
                     selectionParams.splice(i, 1);
                 }
             }
@@ -317,47 +332,52 @@ class ResourceConnectionParams extends Component {
         var tableVisibility = this.state.connectionTypes.length === 0 ? 'hidden' : 'visible';
 
         return (
-        <div className="ResourceManager_props" style={{visibility: visibility}}>
-            <br/>
-            <b>Selection params</b>
-            <BootstrapTable data={this.state.selectionParams}
-                            striped={true}
-                            hover={true}
-                            cellEdit={selectionParamsCellEditProp}
-                            insertRow={true}
-                            deleteRow={true}
-                            selectRow={selectionParamsSelectRowProp}
-                            options={ selectionParamsOptions }
-            >
-                <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
-                <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
-            </BootstrapTable>
-            <BootstrapTable data={connectionTypesArr}
-                            striped={true}
-                            hover={true}
-                            insertRow={true}
-                            deleteRow={true}
-                            selectRow={connTypeSelectRowProp}
-                            options={ connTypeOptions }
-            >
-                <TableHeaderColumn isKey={true} dataField="value">Connection type</TableHeaderColumn>
-            </BootstrapTable>
-            <br/>
-               <b>Connection params</b>
-               <BootstrapTable data={this.state.connParams.params}
-                    style={{visibility: tableVisibility}}
-                    striped={true}
-                    hover={true}
-                    cellEdit={cellEditProp}
-                    insertRow={true}
-                    deleteRow={true}
-                    selectRow={selectRowProp}
-                    options={ options }
-                >
-                <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
-                <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
-            </BootstrapTable>
-        </div>
+            <Grid style={{visibility: visibility}}>
+                <Row className="show-grid">
+                    <Col sm={2} md={4} lg={4}>
+                        <b>Selection params</b>
+                        <BootstrapTable data={this.state.selectionParams}
+                                        striped={true}
+                                        hover={true}
+                                        cellEdit={selectionParamsCellEditProp}
+                                        insertRow={true}
+                                        deleteRow={true}
+                                        selectRow={selectionParamsSelectRowProp}
+                                        options={ selectionParamsOptions }
+                        >
+                            <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+                            <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
+                        </BootstrapTable>
+                    </Col>
+                    <Col sm={2} md={4} lg={4}>
+                        <BootstrapTable data={connectionTypesArr}
+                                        striped={true}
+                                        hover={true}
+                                        insertRow={true}
+                                        deleteRow={true}
+                                        selectRow={connTypeSelectRowProp}
+                                        options={ connTypeOptions }
+                        >
+                            <TableHeaderColumn isKey={true} dataField="value">Connection type</TableHeaderColumn>
+                        </BootstrapTable>
+                        <br/>
+                        <b>Connection params</b>
+                        <BootstrapTable data={this.state.connParams.params}
+                                        style={{visibility: tableVisibility}}
+                                        striped={true}
+                                        hover={true}
+                                        cellEdit={cellEditProp}
+                                        insertRow={true}
+                                        deleteRow={true}
+                                        selectRow={selectRowProp}
+                                        options={ options }
+                        >
+                            <TableHeaderColumn isKey={true} dataField="name">Name</TableHeaderColumn>
+                            <TableHeaderColumn dataField="value">Value</TableHeaderColumn>
+                        </BootstrapTable>
+                    </Col>
+                </Row>
+            </Grid>
         )
     }
 }
