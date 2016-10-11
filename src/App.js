@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import logo from './logo.png';
 import './App.css';
 import ConnectionDetailsBox from './ConnectionDetailsBox';
+import DiscoveryGraphBox from './DiscoveryGraphBox';
 import ConnectionDetailsClient from './ConnectionDetailsClient';
 import ResourceManagerBox from './ResourceManagerBox';
 import ResourceManagerClient from './ResourceManagerClient';
@@ -57,6 +58,12 @@ class App extends Component {
         component: (<NetDiscovererBox client={NetDiscovererClient} pollInterval={2000}/>)
     });
 
+    handleGraphSelected = () =>
+        this.setState({
+            open: false,
+            component: (<DiscoveryGraphBox/>)
+        });
+
     render() {
         return (
             <MuiThemeProvider muiTheme={lightMuiTheme}>
@@ -74,6 +81,7 @@ class App extends Component {
                         <MenuItem onTouchTap={this.handleConnDetailsSelected}>Connections</MenuItem>
                         <MenuItem onTouchTap={this.handleResourcesSelected}>Resources</MenuItem>
                         <MenuItem onTouchTap={this.handleDiscoverySelected}>Discovery</MenuItem>
+                        <MenuItem onTouchTap={this.handleGraphSelected.bind(this)}>Graph</MenuItem>
                     </Drawer>
                     { this.state.component }
                 </div>

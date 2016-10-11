@@ -1,25 +1,7 @@
 import axios from 'axios';
 
-function getVersions(cb) {
-    return axios.get(`/wsitransformer/api/discovery/`, {
-    }).then(checkStatus)
-        .then(parseJSON)
-        .then(cb);
-}
-
-function createVersion(cb) {
-    return axios.post(`/wsitransformer/api/discovery/`)
-        .then(checkStatus)
-        .then(cb)
-}
-
-function deleteVersion(version, cb) {
-    return axios.delete(`/wsitransformer/api/discovery/${version}`)
-        .then(checkStatus);
-}
-
 function getDiscoverer(version, cb) {
-    return axios.get(`/wsitransformer/api/discovery/${version}/discoverer`, {
+    return axios.get(`/wsitransformer/api/discovery/${version}/discoverer/`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
@@ -59,9 +41,6 @@ function parseJSON(response) {
 }
 
 const ConnectionDetailsClient = {
-    getVersions,
-    createVersion,
-    deleteVersion,
     getDiscoverer,
     createDiscoverer,
     updateDiscoverer,

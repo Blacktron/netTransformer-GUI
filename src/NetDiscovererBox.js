@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import RaisedButton from 'material-ui/RaisedButton';
+import VersionClient from './VersionClient';
 
 class NetDiscovererBox extends Component {
     constructor(props) {
@@ -8,116 +8,15 @@ class NetDiscovererBox extends Component {
         this.state = {
         };
     }
-    versionListChanged = (name) => {
-        this.refs.discoverer.loadDiscovererFromServer(name);
-    };
     render() {
         return (
-            <div className="ConnectionDetailsBox">
-                <VersionList client={this.props.client} pollInterval={this.props.pollInterval} onChange={this.versionListChanged.bind(this)}>
-                </VersionList>
-                <Discoverer client={this.props.client} pollInterval={this.props.pollInterval} ref="discoverer">
+            <div className="NetDiscovererBox">
+                <Discoverer client={this.props.client} pollInterval={this.props.pollInterval}>
                 </Discoverer>
             </div>
         )
     }
 }
-
-class VersionList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            versions: [],
-            version: null
-        };
-        // Functions must be bound manually with ES6 classes
-        this.loadVersionsFromServer = this.loadVersionsFromServer.bind(this);
-    }
-    loadVersionsFromServer(){
-        this.props.client.getVersions((versions) => {
-            var arr = Object.keys(versions).map(function(k) { return {name: versions[k] }});
-            this.setState({
-                versions: arr,
-                version: null
-            });
-        });
-    }
-    componentDidMount() {
-        this.loadVersionsFromServer();
-    }
-
-    handleRequestChange = (event) => {
-        this.props.onChange(event.name);
-    };
-
-    onInsertRow() {
-        var self = this;
-	    this.props.client.createVersion(function (version) {
-            self.state.versions.push({name: version.data});
-            // self.refs.table.handleAddRow(version);
-            self.setState({versions: self.state.versions, version: version.data});
-            self.props.onChange(version.data);
-        });
-    };
-
-    onDeleteRow() {
-        var rowKeys = this.refs.table.state.selectedRowKeys;
-        var self = this;
-        if (rowKeys.length === 1) {
-            var version = rowKeys[0].trim();
-            this.props.client.deleteVersion(version);
-            var versions = this.state.versions;
-            for(var i = versions.length - 1; i >= 0; i--) {
-                if(versions[i].name === version) {
-                    versions.splice(i, 1);
-                }
-            }
-            self.props.onChange(null);
-            self.setState({versions: versions, version: null});
-        }
-    };
-
-    render() {
-        var selectRowProp = {
-            mode: "radio",
-            clickToSelect: true,
-            bgColor: "rgb(238, 193, 213)",
-            selected: [this.state.version],
-            onSelect: this.handleRequestChange
-        };
-
-        return (
-            <div className="Version_names">
-                <b>Versions</b>
-                <div className="react-bs-table-container">
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-6 col-md-6 col-lg-8">
-                            <div className="btn-group btn-group-sm" role="group">
-                                <button className="btn btn-info react-bs-table-add-btn" onClick={this.onInsertRow.bind(this)} type="button">
-                                    <i className="glyphicon glyphicon-plus"/> Add
-                                </button>
-                                <button className="btn btn-warning react-bs-table-del-btn" onClick={this.onDeleteRow.bind(this)} type="button">
-                                    <i className="glyphicon glyphicon-trash"/> Remove
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <BootstrapTable data={this.state.versions}
-                                    striped={true}
-                                    hover={true}
-                                    insertRow={false}
-                                    deleteRow={false}
-                                    selectRow={selectRowProp}
-                                    ref="table"
-                    >
-                        <TableHeaderColumn isKey={true} dataField="name">Version</TableHeaderColumn>
-                    </BootstrapTable>
-                </div>
-            </div>
-        )
-    }
-}
-
 class Discoverer extends Component {
     constructor(props) {
         super(props);
@@ -157,7 +56,14 @@ class Discoverer extends Component {
     }
 
     startDiscovery(){
-        this.props.client.createDiscoverer(this.state.version);
+        var self = this;
+        VersionClient.createVersion(function (version) {
+            console.log("here");
+            self.props.client.createDiscoverer(version.data);
+            self.setState({version: version.data, discoveryStatus: null});
+        });
+
+
     }
     pauseDiscovery(){
         this.props.client.updateDiscoverer(this.state.version, "PAUSE");
@@ -170,14 +76,13 @@ class Discoverer extends Component {
     }
 
     render() {
-        var visibility = this.state.version == null ? 'hidden' : 'visible';
         var style = {
-            margin: 4,
-            visibility: visibility
+            margin: 4
         };
         return (
-        <div className="Version_props" style={{visibility: visibility}}>
+        <div className="Version_props">
             <b>Discovery Status: {this.state.discoveryStatus}</b><br/>
+            <b>Discovery Version: {this.state.version}</b><br/>
             <RaisedButton label="Start"
                           style={style}
                           disabled={this.state.discoveryStatus !== null}
