@@ -43,7 +43,7 @@ class ResourceList extends Component {
     }
 
     loadResourceFromServer() {
-        this.props.client.getResource((resource) => {
+        this.props.client.getResourceNames((resource) => {
             var arr = Object.keys(resource).map(function (k) {
                 return {name: resource[k]}
             });
@@ -70,13 +70,13 @@ class ResourceList extends Component {
     };
 
     onAfterInsertRow(row) {
-        this.props.client.createResource(row.name.trim());
+        this.props.client.createResourceName(row.name.trim());
         this.props.onChange();
     };
 
     onAfterDeleteRow(rowKeys) {
         for (var i = 0; i < rowKeys.length; i++) {
-            this.props.client.deleteResource(rowKeys[i].trim());
+            this.props.client.deleteResourceName(rowKeys[i].trim());
         }
         this.props.onChange();
     };

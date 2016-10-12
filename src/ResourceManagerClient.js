@@ -1,19 +1,19 @@
 import axios from 'axios';
 
-function getResource(cb) {
-    return axios.get(`/wsitransformer/api/resource/`, {
+function getResourceNames(cb) {
+    return axios.get(`/wsitransformer/api/resource/names`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
 }
 
-function createResource(name, cb) {
+function createResourceName(name, cb) {
     const config = { headers: { 'Content-Type': 'application/json' } };
-    return axios.post(`/wsitransformer/api/resource/`, '"'+name+'"', config)
+    return axios.post(`/wsitransformer/api/resource/names`, '"'+name+'"', config)
         .then(checkStatus);
 }
 
-function deleteResource(name, cb) {
+function deleteResourceName(name, cb) {
     return axios.delete(`/wsitransformer/api/resource/${name}`)
         .then(checkStatus);
 }
@@ -112,9 +112,9 @@ function jsonToQueryString(json) {
 }
 
 const ResourceManagerClient = {
-    getResource,
-    createResource,
-    deleteResource,
+    getResourceNames,
+    createResourceName,
+    deleteResourceName,
     getConnectionParams,
     createConnectionParam,
     deleteConnectionParam,
