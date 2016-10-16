@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 function getNetwork(version, cb) {
-    return axios.get(`/wsitransformer/api/discovery/${version}/network`, {
+    // api/topology_viewer/version1/graph
+    // return axios.get(`/wsitransformer/api/discovery/${version}/network`, {
+    return axios.get(`/wsitransformer/api/topology_viewer/${version}/graph`, {
     }).then(checkStatus)
         .then(parseJSON)
         .then(cb);
