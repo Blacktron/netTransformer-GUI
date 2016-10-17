@@ -73,11 +73,20 @@ class App extends Component {
 
         this.refs.versionDialog.handleOpen();
     }
+    handleCloseGraphSelected = () => {
+        this.setState({
+            open: false,
+            component: 'DiscoveryGraphBox'
+        });
+
+        this.refs.discoveryGraphBox.handleCloseGraph();
+    }
 
     handleVersion(version){
-        this.refs.discoveryGraphBox.versionListChanged(version);
+        this.refs.discoveryGraphBox.handleOpenGraph(version);
         this.handleShowGraphSelected();
     }
+    
     render() {
         self = this;
         return (
@@ -97,6 +106,7 @@ class App extends Component {
                         <MenuItem onTouchTap={this.handleResourcesSelected}>Resources</MenuItem>
                         <MenuItem onTouchTap={this.handleDiscoverySelected}>Discovery</MenuItem>
                         <MenuItem onTouchTap={self.handleOpenGraphSelected.bind(self)}>Open Graph</MenuItem>
+                        <MenuItem onTouchTap={self.handleCloseGraphSelected.bind(self)}>Close Graph</MenuItem>
                         <MenuItem onTouchTap={self.handleShowGraphSelected.bind(self)}>Show Graph</MenuItem>
                     </Drawer>
                     <ConnectionDetailsBox style={ {display:  (this.state.component === 'ConnectionDetailsBox' ? "block" : "none" ) }} client={ConnectionDetailsClient} pollInterval={2000}/>
