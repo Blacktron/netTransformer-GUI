@@ -100,6 +100,7 @@ class App extends Component {
                     <Drawer
                         docked={false}
                         open={this.state.open}
+                        onRequestChange={(open) => this.setState({open})}
                     >
                         <MenuItem onTouchTap={this.handleClose}><IconButton><ArrowBackIcon /></IconButton></MenuItem>
                         <MenuItem onTouchTap={this.handleConnDetailsSelected}>Connections</MenuItem>
