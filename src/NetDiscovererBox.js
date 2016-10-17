@@ -10,7 +10,7 @@ class NetDiscovererBox extends Component {
     }
     render() {
         return (
-            <div className="NetDiscovererBox">
+            <div className="NetDiscovererBox"  style={this.props.style}>
                 <Discoverer client={this.props.client} pollInterval={this.props.pollInterval}>
                 </Discoverer>
             </div>

@@ -20,15 +20,10 @@ class DiscoveryGraphBox extends Component {
 
     render() {
         return (
-            <Grid>
+            <Grid  style={this.props.style}>
                 <Row className="show-grid">
-                    <Col sm={2} md={4} lg={4}>
-
-                        <VersionList onChange={this.versionListChanged.bind(this)}>
-                        </VersionList>
-                    </Col>
                     <Col sm={4} md={8} lg={8}>
-                        <DiscoveryGraph ref="discoveryGraph">
+                        <DiscoveryGraph style={this.props.style} ref="discoveryGraph">
                         </DiscoveryGraph>
                     </Col>
                 </Row>
@@ -36,109 +31,6 @@ class DiscoveryGraphBox extends Component {
         );
     }
 }
-
-
-class VersionList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            versions: [],
-            version: null
-        };
-        // Functions must be bound manually with ES6 classes
-        this.loadVersionsFromServer = this.loadVersionsFromServer.bind(this);
-    }
-
-    loadVersionsFromServer() {
-        VersionClient.getVersions((versions) => {
-            var arr = Object.keys(versions).map(function (k) {
-                return {name: versions[k]}
-            });
-            this.setState({
-                versions: arr,
-                version: null
-            });
-        });
-    }
-
-    componentDidMount() {
-        this.loadVersionsFromServer();
-    }
-
-    handleRequestChange = (event) => {
-        this.props.onChange(event.name);
-    };
-
-    onInsertRow() {
-        var self = this;
-        VersionClient.createVersion(function (version) {
-            self.state.versions.push({name: version.data});
-            // self.refs.table.handleAddRow(version);
-            self.setState({versions: self.state.versions, version: version.data});
-            self.props.onChange(version.data);
-        });
-    };
-
-    onDeleteRow() {
-        var rowKeys = this.refs.table.state.selectedRowKeys;
-        var self = this;
-        if (rowKeys.length === 1) {
-            var version = rowKeys[0].trim();
-            VersionClient.deleteVersion(version);
-            var versions = this.state.versions;
-            for (var i = versions.length - 1; i >= 0; i--) {
-                if (versions[i].name === version) {
-                    versions.splice(i, 1);
-                }
-            }
-            self.props.onChange(null);
-            self.setState({versions: versions, version: null});
-        }
-    };
-
-    render() {
-        var selectRowProp = {
-            mode: "radio",
-            clickToSelect: true,
-            bgColor: "rgb(238, 193, 213)",
-            selected: [this.state.version],
-            onSelect: this.handleRequestChange
-        };
-
-        return (
-            <div className="Version_names">
-                <b>Versions</b>
-                <div className="react-bs-table-container">
-                    <div className="row">
-                        <div className="col-xs-12 col-sm-6 col-md-6 col-lg-8">
-                            <div className="btn-group btn-group-sm" role="group">
-                                <button className="btn btn-info react-bs-table-add-btn"
-                                        onClick={this.onInsertRow.bind(this)} type="button">
-                                    <i className="glyphicon glyphicon-plus"/> Add
-                                </button>
-                                <button className="btn btn-warning react-bs-table-del-btn"
-                                        onClick={this.onDeleteRow.bind(this)} type="button">
-                                    <i className="glyphicon glyphicon-trash"/> Remove
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <BootstrapTable data={this.state.versions}
-                                    striped={true}
-                                    hover={true}
-                                    insertRow={false}
-                                    deleteRow={false}
-                                    selectRow={selectRowProp}
-                                    ref="table"
-                    >
-                        <TableHeaderColumn isKey={true} dataField="name">Version</TableHeaderColumn>
-                    </BootstrapTable>
-                </div>
-            </div>
-        )
-    }
-}
-
 
 class DiscoveryGraph extends Component {
     constructor(props) {
@@ -148,7 +40,8 @@ class DiscoveryGraph extends Component {
         this.state = {
             network: {nodes: [], edges: []},
             hierarchicalLayout: true,
-            identifier: identifier ? identifier : uuid.v4()
+            identifier: identifier ? identifier : uuid.v4(),
+            updated: false
         };
     }
 
@@ -172,14 +65,16 @@ class DiscoveryGraph extends Component {
                 this.setState({
                     network: {nodes: nodes, edges: edges},
                     hierarchicalLayout: this.state.hierarchicalLayout,
-                    identifier: this.state.identifier
+                    identifier: this.state.identifier,
+                    updated: false
                 });
             });
         } else {
             this.setState({
                 network: {nodes: [], edges: []},
                 hierarchicalLayout: this.state.hierarchicalLayout,
-                identifier: this.state.identifier
+                identifier: this.state.identifier,
+                updated: false
             });
         }
     };
@@ -187,9 +82,12 @@ class DiscoveryGraph extends Component {
     componentDidMount() {
         this.updateGraph();
     }
-
+    shouldComponentUpdate(nextProps, nextState) {
+        return !nextState.updated;
+    }
     componentDidUpdate() {
         this.updateGraph();
+        this.state.updated = true;
     }
 
     updateGraph() {
@@ -286,6 +184,7 @@ class DiscoveryGraph extends Component {
         };
 
         container.style.height = '600px';
+        container.style.width = '800px';
         new vis.Network(container, this.state.network, options);
     }
 

@@ -3,6 +3,7 @@ import logo from './logo.png';
 import './App.css';
 import ConnectionDetailsBox from './ConnectionDetailsBox';
 import DiscoveryGraphBox from './DiscoveryGraphBox';
+import VersionDialog from './VersionDialog';
 import ConnectionDetailsClient from './ConnectionDetailsClient';
 import ResourceManagerBox from './ResourceManagerBox';
 import ResourceManagerClient from './ResourceManagerClient';
@@ -45,26 +46,40 @@ class App extends Component {
 
     handleConnDetailsSelected = () => this.setState({
         open: false,
-        component: (<ConnectionDetailsBox client={ConnectionDetailsClient} pollInterval={2000}/>)
+        component: 'ConnectionDetailsBox'
     });
 
     handleResourcesSelected = () => this.setState({
         open: false,
-        component: (<ResourceManagerBox client={ResourceManagerClient} pollInterval={2000}/>)
+        component: 'ResourceManagerBox'
     });
 
     handleDiscoverySelected = () => this.setState({
         open: false,
-        component: (<NetDiscovererBox client={NetDiscovererClient} pollInterval={2000}/>)
+        component: 'NetDiscovererBox'
     });
 
-    handleGraphSelected = () =>
+    handleShowGraphSelected = () => {
         this.setState({
             open: false,
-            component: (<DiscoveryGraphBox/>)
+            component: 'DiscoveryGraphBox'
+        });
+    }
+    handleOpenGraphSelected = () => {
+        this.setState({
+            open: false,
+            component: 'VersionDialog'
         });
 
+        this.refs.versionDialog.handleOpen();
+    }
+
+    handleVersion(version){
+        this.refs.discoveryGraphBox.versionListChanged(version);
+        this.handleShowGraphSelected();
+    }
     render() {
+        self = this;
         return (
             <MuiThemeProvider muiTheme={lightMuiTheme}>
                 <div className="App">
@@ -81,9 +96,14 @@ class App extends Component {
                         <MenuItem onTouchTap={this.handleConnDetailsSelected}>Connections</MenuItem>
                         <MenuItem onTouchTap={this.handleResourcesSelected}>Resources</MenuItem>
                         <MenuItem onTouchTap={this.handleDiscoverySelected}>Discovery</MenuItem>
-                        <MenuItem onTouchTap={this.handleGraphSelected.bind(this)}>Graph</MenuItem>
+                        <MenuItem onTouchTap={self.handleOpenGraphSelected.bind(self)}>Open Graph</MenuItem>
+                        <MenuItem onTouchTap={self.handleShowGraphSelected.bind(self)}>Show Graph</MenuItem>
                     </Drawer>
-                    { this.state.component }
+                    <ConnectionDetailsBox style={ {display:  (this.state.component === 'ConnectionDetailsBox' ? "block" : "none" ) }} client={ConnectionDetailsClient} pollInterval={2000}/>
+                    <ResourceManagerBox style={ { display:  (this.state.component === 'ResourceManagerBox' ? "block" : "none")}} client={ResourceManagerClient} pollInterval={2000}/>
+                    <NetDiscovererBox style={ { display:  (this.state.component === 'NetDiscovererBox' ? "block" : "none")}} client={NetDiscovererClient} pollInterval={2000}/>
+                    <DiscoveryGraphBox ref="discoveryGraphBox" style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} />
+                    <VersionDialog handleOpenVersion={self.handleVersion.bind(self)} style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} ref="versionDialog"/>
                 </div>
             </MuiThemeProvider>
         );

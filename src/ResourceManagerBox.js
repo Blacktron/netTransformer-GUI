@@ -14,7 +14,7 @@ class ResourceManagerBox extends Component {
 
     render() {
         return (
-            <Grid>
+            <Grid  style={this.props.style}>
                 <Row className="show-grid">
                     <Col sm={2} md={4} lg={4}>
                         <ResourceList client={this.props.client} pollInterval={this.props.pollInterval}
