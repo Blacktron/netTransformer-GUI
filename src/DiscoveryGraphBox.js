@@ -1,10 +1,10 @@
 import {default as React, Component} from 'react';
-import VersionClient from './VersionClient';
+//import VersionClient from './VersionClient';
 import DiscoveryGraphClient from './DiscoveryGraphClient';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import {Grid, Row, Col} from 'react-bootstrap';
+//import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+//import {Grid, Row, Col} from 'react-bootstrap';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
+//import RefreshIndicator from 'material-ui/RefreshIndicator';
 
 const vis = require('vis');
 const uuid = require('uuid');

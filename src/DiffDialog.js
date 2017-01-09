@@ -1,9 +1,10 @@
-import {default as React} from 'react';
-import VersionClient from './VersionClient';
-//import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-//import { Grid, Row, Col } from 'react-bootstrap';
+import {default as React, Component} from 'react';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { Grid, Row, Col } from 'react-bootstrap';
 import FlatButton from 'material-ui/FlatButton';
-//import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import DiffClient from './DiffClient';
+
 import Dialog from 'material-ui/Dialog';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
@@ -13,19 +14,21 @@ const styles = {
     },
 };
 
-class VersionDialog extends React.Component {
+class DiffDialog extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             open: false,
             versions: [],
         };
         // Functions must be bound manually with ES6 classes
-        this.loadVersionsFromServer = this.loadVersionsFromServer.bind(this);
+        this.selectVersions = this.selectVersions.bind(this);
     }
 
     handleOpen = () => {
-        this.loadVersionsFromServer();
+        this.selectVersions();
+        //this.loadVersionsFromServer();
     };
 
     handleClose = () => {
@@ -33,14 +36,28 @@ class VersionDialog extends React.Component {
     };
     
     handleOpenVersion() {
+        console.log("handleOpen");
+
         this.handleClose();
-        this.props.handleOpenVersion(this.refs.radioButtonGroup.state.selected);
+        //this.props.handleOpenVersion(this.refs.radioButtonGroup.state.selected);
     }
     componentDidMount() {
         //this.handleOpen();
     }
-    loadVersionsFromServer() {
-        VersionClient.getVersions((versions) => {
+    selectVersions() {
+       console.log("GetVersion1");
+
+        DiffClient.getVersion((versions) => {
+            var arr1 = Object.keys(versions).map(function (k) {
+                return {name: versions[k]}
+            });
+            this.setState({
+                versions: arr1,
+                open: false
+            });
+        });
+        console.log("GetVersion2");
+        DiffClient.getVersion((versions) => {
             var arr = Object.keys(versions).map(function (k) {
                 return {name: versions[k]}
             });
@@ -49,6 +66,7 @@ class VersionDialog extends React.Component {
                 open: true
             });
         });
+
     }
     render() {
         self = this;
@@ -59,7 +77,7 @@ class VersionDialog extends React.Component {
                 onTouchTap={this.handleClose}
             />,
             <FlatButton
-                label="Open"
+                label="Select"
                 primary={true}
                 keyboardFocused={true}
                 onTouchTap={self.handleOpenVersion.bind(self)}
@@ -81,7 +99,19 @@ class VersionDialog extends React.Component {
         return (
             <div>
                 <Dialog
-                    title="Select graph version"
+                    title="Select graphA version"
+                    actions={actions}
+                    modal={false}
+                    open={this.state.open}
+                    onRequestClose={this.handleClose}
+                    autoScrollBodyContent={true}
+                >
+                    <RadioButtonGroup name="shipSpeed" defaultSelected="not_light" ref="radioButtonGroup">
+                        {radios}
+                    </RadioButtonGroup>
+                </Dialog>
+                <Dialog
+                    title="Select graphB version"
                     actions={actions}
                     modal={false}
                     open={this.state.open}
@@ -93,9 +123,10 @@ class VersionDialog extends React.Component {
                     </RadioButtonGroup>
                 </Dialog>
             </div>
+
         );
     }
 }
 
 
-export default VersionDialog;
+export default DiffDialog;
