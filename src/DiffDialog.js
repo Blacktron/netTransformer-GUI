@@ -1,9 +1,6 @@
-import {default as React, Component} from 'react';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import { Grid, Row, Col } from 'react-bootstrap';
+import {default as React} from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import DiffClient from './DiffClient';
+import Divider from 'material-ui/Divider';
 
 import Dialog from 'material-ui/Dialog';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
@@ -28,18 +25,19 @@ class DiffDialog extends React.Component {
 
     handleOpen = () => {
         this.selectVersions();
-        //this.loadVersionsFromServer();
     };
 
     handleClose = () => {
         this.setState({open: false});
     };
     
-    handleOpenVersion() {
-        console.log("handleOpen");
-
-        this.handleClose();
-        //this.props.handleOpenVersion(this.refs.radioButtonGroup.state.selected);
+    handleCreateDiff() {
+        this.setState({open: false});
+        this.props.client.doDiff(this.refs.radioButtonGroup1.state.selected, this.refs.radioButtonGroup2.state.selected,
+            () => {
+                console.log();
+              this.props.handleDiffVersion("version1-version1");
+            });
     }
     componentDidMount() {
         //this.handleOpen();
@@ -47,7 +45,7 @@ class DiffDialog extends React.Component {
     selectVersions() {
        console.log("GetVersion1");
 
-        DiffClient.getVersion((versions) => {
+        this.props.client.getVersion((versions) => {
             var arr1 = Object.keys(versions).map(function (k) {
                 return {name: versions[k]}
             });
@@ -57,7 +55,7 @@ class DiffDialog extends React.Component {
             });
         });
         console.log("GetVersion2");
-        DiffClient.getVersion((versions) => {
+        this.props.client.getVersion((versions) => {
             var arr = Object.keys(versions).map(function (k) {
                 return {name: versions[k]}
             });
@@ -69,7 +67,6 @@ class DiffDialog extends React.Component {
 
     }
     render() {
-        self = this;
         const actions = [
             <FlatButton
                 label="Cancel"
@@ -80,7 +77,7 @@ class DiffDialog extends React.Component {
                 label="Select"
                 primary={true}
                 keyboardFocused={true}
-                onTouchTap={self.handleOpenVersion.bind(self)}
+                onTouchTap={this.handleCreateDiff.bind(this)}
             />,
         ];
 
@@ -99,26 +96,19 @@ class DiffDialog extends React.Component {
         return (
             <div>
                 <Dialog
-                    title="Select graphA version"
+                    title="Select versions"
                     actions={actions}
                     modal={false}
                     open={this.state.open}
                     onRequestClose={this.handleClose}
                     autoScrollBodyContent={true}
                 >
-                    <RadioButtonGroup name="shipSpeed" defaultSelected="not_light" ref="radioButtonGroup">
+
+                    <RadioButtonGroup name="ver1" defaultSelected="not_light" ref="radioButtonGroup1">
                         {radios}
                     </RadioButtonGroup>
-                </Dialog>
-                <Dialog
-                    title="Select graphB version"
-                    actions={actions}
-                    modal={false}
-                    open={this.state.open}
-                    onRequestClose={this.handleClose}
-                    autoScrollBodyContent={true}
-                >
-                    <RadioButtonGroup name="shipSpeed" defaultSelected="not_light" ref="radioButtonGroup">
+                    <Divider />
+                    <RadioButtonGroup name="ver2" defaultSelected="not_light" ref="radioButtonGroup2">
                         {radios}
                     </RadioButtonGroup>
                 </Dialog>

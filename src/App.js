@@ -93,24 +93,13 @@ class App extends Component {
 
         this.refs.diffDialog.handleOpen();
     }
-    handleDoDiff = (version1,version2) => {
-        console.log("---->"+"Diffing graphs for versions "+version1 +" "+ version2);
-        this.setState({
-            open: false,
-            component: 'DiffDialog'
-        });
-
-        this.refs.diffDialog.handleOpen(version1,version2);
-    }
-
 
     handleVersion(version){
         this.refs.discoveryGraphBox.handleOpenGraph(version);
         this.handleShowGraphSelected();
     }
-    
+
     render() {
-        self = this;
         return (
             <MuiThemeProvider muiTheme={lightMuiTheme}>
                 <div className="App">
@@ -128,19 +117,19 @@ class App extends Component {
                         <MenuItem onTouchTap={this.handleConnDetailsSelected}>Connections</MenuItem>
                         <MenuItem onTouchTap={this.handleResourcesSelected}>Resources</MenuItem>
                         <MenuItem onTouchTap={this.handleDiscoverySelected}>Discover</MenuItem>
-                        <MenuItem onTouchTap={self.handleOpenGraphSelected.bind(self)}>Open</MenuItem>
-                        <MenuItem onTouchTap={self.handleCloseGraphSelected.bind(self)}>Close</MenuItem>
-                        <MenuItem onTouchTap={self.handleShowGraphSelected.bind(self)}>Show</MenuItem>
-                        <MenuItem onTouchTap={self.handleDiffGraphSelected.bind(self)}>Diff</MenuItem>
+                        <MenuItem onTouchTap={this.handleOpenGraphSelected.bind(this)}>Open</MenuItem>
+                        <MenuItem onTouchTap={this.handleCloseGraphSelected.bind(this)}>Close</MenuItem>
+                        <MenuItem onTouchTap={this.handleShowGraphSelected.bind(this)}>Show</MenuItem>
+                        <MenuItem onTouchTap={this.handleDiffGraphSelected.bind(this)}>Diff</MenuItem>
 
                     </Drawer>
                     <ConnectionDetailsBox style={ {display:  (this.state.component === 'ConnectionDetailsBox' ? "block" : "none" ) }} client={ConnectionDetailsClient} pollInterval={2000}/>
                     <ResourceManagerBox style={ { display:  (this.state.component === 'ResourceManagerBox' ? "block" : "none")}} client={ResourceManagerClient} pollInterval={2000}/>
                     <NetDiscovererBox style={ { display:  (this.state.component === 'NetDiscovererBox' ? "block" : "none")}} client={NetDiscovererClient} pollInterval={2000}/>
                     <DiscoveryGraphBox ref="discoveryGraphBox" style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} />
-                    <VersionDialog handleOpenVersion={self.handleVersion.bind(self)} style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} ref="versionDialog"/>
+                    <VersionDialog handleOpenVersion={this.handleVersion.bind(this)} style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} ref="versionDialog"/>
                     <ResourceManagerBox style={ { display:  (this.state.component === 'ResourceManagerBox' ? "block" : "none")}} client={ResourceManagerClient} pollInterval={2000}/>
-                    <DiffDialog handleDoDiff={self.handleDoDiff.bind(self)} style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} ref="diffDialog"/>
+                    <DiffDialog handleDiffVersion={this.handleVersion.bind(this)} style={ {display:  (this.state.component === 'DiscoveryGraphBox' ? "block" : "none")}} ref="diffDialog" client={DiffClient}/>
 
                 </div>
             </MuiThemeProvider>

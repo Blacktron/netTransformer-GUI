@@ -36,11 +36,10 @@ class DiscoveryGraphBox extends Component {
     }
 
     render() {
-        self = this;
         let tabs = [];
         for (let i = 0; i < this.state.tabs.length; i++) {
             tabs.push(
-                <Tab label={`${this.state.tabs[i].label}`} value={i} key={i} onActive={self.tabClicked.bind(self,i)}>
+                <Tab label={`${this.state.tabs[i].label}`} value={i} key={i} onActive={this.tabClicked.bind(this,i)}>
                     <DiscoveryGraph version={`${this.state.tabs[i].version}`} style={this.props.style}/>
                 </Tab>
             )
@@ -242,4 +241,3 @@ DiscoveryGraph.defaultProps = {
 };
 
 export default DiscoveryGraphBox;
-const radios = [];

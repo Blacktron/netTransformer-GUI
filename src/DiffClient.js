@@ -8,14 +8,11 @@ function getVersion(cb) {
         .then(cb);
 }
 
-function doDiff(cb) {
+function doDiff(version1, version2, cb) {
+    console.log("---->"+version1);
+    console.log("---->"+version2)
 
-    const versionA = "version1";
-    const versionB = "version2";
-    console.log("---->"+versionA); // eslint-disable-line no-console
-    console.log("---->"+versionB)
-
-    return axios.post(`/wsitransformer/api/diff/`, '"'+versionA+'"','"'+versionB+'"' )
+    return axios.post(`/wsitransformer/api/diff/`, jsonToQueryString({versionA: version1, versionB: version2}) )
         .then(checkStatus)
         .then(cb);
 }
@@ -34,6 +31,13 @@ function checkStatus(response) {
         throw error;
     }
 }
+function jsonToQueryString(json) {
+    return Object.keys(json).map(function(key) {
+        return encodeURIComponent(key) + '=' +
+            encodeURIComponent(json[key]);
+    }).join('&');
+}
+
 
 function parseJSON(response) {
     return response.data;

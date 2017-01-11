@@ -51,7 +51,6 @@ class VersionDialog extends React.Component {
         });
     }
     render() {
-        self = this;
         const actions = [
             <FlatButton
                 label="Cancel"
@@ -62,7 +61,7 @@ class VersionDialog extends React.Component {
                 label="Open"
                 primary={true}
                 keyboardFocused={true}
-                onTouchTap={self.handleOpenVersion.bind(self)}
+                onTouchTap={this.handleOpenVersion.bind(this)}
             />,
         ];
 
