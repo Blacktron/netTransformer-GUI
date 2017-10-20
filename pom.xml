@@ -81,18 +81,17 @@
     </scm>
 
     <distributionManagement>
-        <repository>
-            <id>jfrogrepo</id>
-            <name>jfrogrepo-releases</name>
-            <url>http://build.itransformers.net:8081/artifactory/ext-release-local</url>
-        </repository>
         <snapshotRepository>
-            <id>jfrogrepo</id>
-            <name>jfrogrepo-releases</name>
-            <url>http://build.itransformers.net:8081/artifactory/ext-snapshot-local</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-    </distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
 
+
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
