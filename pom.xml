@@ -81,15 +81,15 @@
     </scm>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
 
+        <repository>
+            <id>maven-releases</id>
+            <url>http://193.19.175.202:28081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <url>http://193.19.175.202:28081/repository/maven-snapshots</url>
+        </snapshotRepository>
 
     </distributionManagement>
     <build>
